@@ -1,7 +1,7 @@
 {
   "usuarios": [
     {
-      "id": 1,
+      "id": "1",
       "usuario": "NicoCorra",
       "email": "nicocorrales@gmail.com"
     }
