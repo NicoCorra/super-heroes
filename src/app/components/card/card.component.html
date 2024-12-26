@@ -13,7 +13,7 @@
       <strong>Primera aparición</strong> {{ heroe().first_appearance }}
       <br>
       <mat-chip-listbox ngSkipHydration>
-        @for (name of heroe().characters.split(',') | slice:0:3; track $index) {
+        @for (name of (heroe().characters || '').split(',') | slice:0:3; track $index) {
           <mat-chip>
             {{ name }}
           </mat-chip>
