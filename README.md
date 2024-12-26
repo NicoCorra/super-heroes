@@ -106,7 +106,7 @@ Install JEST en angular 18
     setupZoneTestEnv();
     import "@testing-library/jest-dom"
 
-`Paso 5`: crear arvhivo a nivel de raíz jest.config.js y agregar el siguiente código
+`Paso 5`: crear archivo a nivel de raíz jest.config.js y agregar el siguiente código
 
 module.exports = {
   preset: 'jest-preset-angular',
