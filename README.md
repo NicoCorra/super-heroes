@@ -160,9 +160,9 @@ module.exports = {
 ## Running unit tests
   npm run test
 
-  npm run test:wath 
+  npm run test:wath
 
-  npm run test:cverage
+  npm run test:coverage
 
 ## Running end-to-end tests
 
