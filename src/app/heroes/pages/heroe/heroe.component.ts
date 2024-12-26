@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { Heroe } from '../../../interfaces/heroe.interface';
 import { HeroesService } from '../../../services/heroes.service';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -16,7 +16,8 @@ import { ImageHeroePipe } from '../../../pipes/image-heroe.pipe';
 })
 export class HeroeComponent implements OnInit {
 
-  public heroe?: Heroe;
+  @Input() heroe?: Heroe;
+  @Input() viewMore: boolean = false;
 
   constructor(
     private heroesService: HeroesService,
@@ -25,7 +26,8 @@ export class HeroeComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.activatedRoute.params
+    if (!this.viewMore) {
+      this.activatedRoute.params
       .pipe(
         switchMap( ({ id }) => this.heroesService.getHeroeById( id )),
       )
@@ -34,9 +36,11 @@ export class HeroeComponent implements OnInit {
         if ( !heroe ) return this.router.navigate([ '/heroes/list' ]);
 
         this.heroe = heroe;
-        console.log( this.heroe);
         return;
       })
+    } else {
+
+    }
   }
 
   goBack():void {

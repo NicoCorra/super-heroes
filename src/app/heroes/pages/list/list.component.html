@@ -2,7 +2,7 @@
 <mat-divider></mat-divider>
 
 <div class="grid bm-8 pt-2">
-    @for (heroe of heroes; track $index) {
+    @for (heroe of heroesToShow; track $index) {
       <div class="col-12 sm:col-4 md:col-12 xl:col-2">
         <heroes-heroe-card [heroe]="heroe">
         </heroes-heroe-card>
@@ -10,4 +10,10 @@
     }
 </div>
 
+<app-paginator
+  [length]="length"
+  [pageSize]="pageSize"
+  (page)="onPageChange($event)"
+  aria-label="Select page">
+</app-paginator>
 
