@@ -1,7 +1,7 @@
 import { TestBed, waitForAsync } from '@angular/core/testing';
 
 import { HeroesService } from './heroes.service';
-import { HttpErrorResponse, provideHttpClient, withFetch } from '@angular/common/http';
+import { provideHttpClient, withFetch } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { firstValueFrom, of } from 'rxjs';
 import { environments } from '../../environments/environments';
@@ -285,5 +285,57 @@ describe('HeroesService', () => {
     req.flush('Error', errorResponse);
 
     expect(await deleteHeroPromise).toBe(false);
+  });
+
+  it('should return true if hero exists', () => {
+    const superhero = 'Batman';
+    const mockHeroes = [
+      {
+        id: 'dc-batman',
+        superhero: 'Batman',
+        publisher: 'DC Comics',
+        alter_ego: 'Bruce Wayne',
+        first_appearance: 'Detective Comics #27',
+        characters: 'Bruce Wayne'
+      }
+    ];
+
+    service.checkHeroeExists(superhero).subscribe(result => {
+      expect(result).toBe(true);
+    });
+
+    const req = httpTesting.expectOne(`${baseUrl}/heroes?superhero=batman`);
+    expect(req.request.method).toBe('GET');
+    req.flush(mockHeroes);
+  });
+
+  it('should return false if hero does not exist', () => {
+    const superhero = 'NonExistentHero';
+    const mockHeroes: any[] = [];
+
+    service.checkHeroeExists(superhero).subscribe(result => {
+      expect(result).toBe(false);
+    });
+
+    const req = httpTesting.expectOne(`${baseUrl}/heroes?superhero=nonexistenthero`);
+    expect(req.request.method).toBe('GET');
+    req.flush(mockHeroes);
+  });
+
+  it('should handle HTTP errors gracefully', () => {
+    const superhero = 'Batman';
+
+    service.checkHeroeExists(superhero).subscribe({
+      next: (result) => {
+        expect(result).toBe(false);
+      },
+      error: (error) => {
+        fail('Expected no error, but got: ' + error);
+      }
+    });
+
+    const req = httpTesting.expectOne(`${baseUrl}/heroes?superhero=batman`);
+    expect(req.request.method).toBe('GET');
+    req.error(new ErrorEvent('NetworkError'));
   });
 });

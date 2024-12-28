@@ -65,5 +65,15 @@ export class HeroesService {
       })
     );
   }
+
+  checkHeroeExists(superhero: string): Observable<boolean> {
+    const heroName = superhero.toLowerCase();
+
+    return this.http.get<any[]>(`${this.baseUrl}/heroes?superhero=${heroName}`).pipe(
+      map(heroes => {
+        return heroes.length > 0;
+      })
+    );
+  }
 }
 
