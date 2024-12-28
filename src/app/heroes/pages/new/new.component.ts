@@ -68,51 +68,66 @@ export class NewComponent implements OnInit{
 
   }
 
-  onSubmit():void {
+  onSubmit(): void {
+    if (this.heroeForm.invalid) return;
 
-    if ( this.heroeForm.invalid ) return;
+    this.currentHeroe.superhero = this.currentHeroe.superhero.toUpperCase();
 
-    if ( this.currentHeroe.id ) {
-      this.heroesService.updateHeroe( this.currentHeroe )
-        .subscribe( hero => {
-          this.showSnackbar(`${ hero.superhero } updated!`);
-        });
-
-      return;
+    if (this.currentHeroe.alt_img) {
+      this.currentHeroe.alt_img = this.currentHeroe.alt_img.toLowerCase();
     }
 
-    this.heroesService.addHeroe( this.currentHeroe )
-      .subscribe( hero => {
-        this.router.navigate(['/heroes/edit', hero.id ]);
-        this.showSnackbar(`${ hero.superhero } created!`);
+    if ( this.router.url.includes('edit') ){
+      const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+        data: {
+          message: `¿Quieres editar el heroe ${this.currentHeroe.superhero}?`
+        }
       });
+      dialogRef.afterClosed().subscribe(result => {
+        if (result) {
+          this.heroesService.updateHeroe( this.currentHeroe )
+          .subscribe( hero => {
+            this.showSnackbar(`${ hero.superhero } updated!`);
+          });
+          this.router.navigate(['/heroes']);
+        } else {
+          this.showSnackbar('Operación cancelada.');
+          this.router.navigate(['/heroes']);
+        }
+      });
+
+    } else {
+      this.heroesService.addHeroe(this.currentHeroe)
+        .subscribe(hero => {
+          this.showSnackbar(`${hero.superhero} creado!`);
+          this.router.navigate(['/heroes']);
+        });
+    };
   }
 
-  onDeleteHero() {
-    if ( !this.currentHeroe.id ) throw Error('Hero id is required');
+  onDeleteHero(): void {
+    if (!this.currentHeroe.id) {
+      throw Error('Hero id is required');
+    }
 
-    const dialogRef = this.dialog.open( ConfirmDialogComponent, {
-      data: this.heroeForm.value
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      data: { message: `¿Estás seguro de que quieres eliminar al héroe ${this.currentHeroe.superhero}?` }
     });
 
-    dialogRef.afterClosed()
-      .pipe(
-        filter( (result: boolean) => result ),
-        switchMap( () => this.heroesService.deleteHeroeById( this.currentHeroe.id )),
-        filter( (wasDeleted: boolean) => wasDeleted ),
-      )
-      .subscribe(() => {
-        this.router.navigate(['/heroes']);
-      });
-
     dialogRef.afterClosed().subscribe(result => {
-      if ( !result ) return;
-
-      this.heroesService.deleteHeroeById( this.currentHeroe.id )
-      .subscribe( wasDeleted => {
-        if ( wasDeleted )
-          this.router.navigate(['/heroes']);
-      })
+      if (result) {
+        this.heroesService.deleteHeroeById(this.currentHeroe.id)
+          .subscribe(wasDeleted => {
+            if (wasDeleted) {
+              this.showSnackbar(`${this.currentHeroe.superhero} ha sido eliminado.`);
+              this.router.navigate(['/heroes']);
+            } else {
+              this.showSnackbar('Hubo un problema al eliminar el héroe.');
+            }
+          });
+      } else {
+        this.showSnackbar('Operación de eliminación cancelada.');
+      }
     });
   }
 
